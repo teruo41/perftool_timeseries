@@ -3,7 +3,8 @@
 
 usage_exit() {
 cat <<EOT
-Usage: $0 -i /path/to/input (without either _p or _0).
+Usage: $0 [-e event[,event2,...]] [-p /path/to/perf] -i /path/to/input
+Note:  input should be without either "_p" or "_0".
 EOT
 exit
 }
