@@ -22,8 +22,8 @@ get_perf_ver() {
 }
 
 check_perf_ver() {
-  REQUIRED=(`echo $1 | sed "s:\.: :g"`)
-  INSTALLED=(`get_perf_ver`)
+  local REQUIRED=(`echo $1 | sed "s:\.: :g"`)
+  local INSTALLED=(`get_perf_ver`)
 
   [ ${#REQUIRED[*]} -lt ${#INSTALLED[*]} ] \
     && NUM=${#REQUIRED[*]} \
