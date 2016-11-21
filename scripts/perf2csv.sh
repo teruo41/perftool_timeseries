@@ -80,21 +80,11 @@ PERF=`which perf`
 while getopts i:h OPT
 do
   case $OPT in
-    i)
-      INPUT=$OPTARG
-      ;;
-    e)
-      EVENTS=$OPTARG
-      ;;
-    h)
-      usage_exit
-      ;;
-    p)
-      PERF=$OPTARG
-      ;;
-    \?)
-      usage_exit
-      ;;
+    i) INPUT=$OPTARG ;;
+    e) EVENTS=$OPTARG ;;
+    h) usage_exit ;;
+    p) PERF=$OPTARG ;;
+    \?) usage_exit ;;
   esac
 done
 
@@ -118,9 +108,9 @@ do
   func1 $TMPDIR/$$ ${OUTPUT} ${IDX} &
 done
 
-
 func2 ${INPUT} ${OUTPUT} &
 
 wait
+
 rm $TMPDIR/$$
 echo ${OUTPUT} > ${TMPDIR}/perf2csv.tmp
