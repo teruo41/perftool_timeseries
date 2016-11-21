@@ -9,6 +9,35 @@ EOT
 exit
 }
 
+split_events() {
+  local STRS=(`echo $EVENTS | sed "s:,: :g"`)
+  local RETVAL=()
+
+  local SLASHFLAG="FALSE"
+  local TEMP=""
+
+  for STR in ${STRS[*]}
+  do
+    if [ $SLASHFLAG == "TRUE" ]; then
+      TMP=$TMP,$STR
+      if [[ "$STR" =~ / ]]; then
+        RETVAL[${#RETVAL[*]}]=$TMP
+        TMP=""
+        SLASHFLAG="FALSE"
+      fi
+    else
+      if [[ "$STR" =~ [^/]+/[^/]+/ ]]; then
+        RETVAL[${#RETVAL[*]}]=$STR
+      elif [[ "$STR" =~ / ]]; then
+        TMP=$STR
+        SLASHFLAG="TRUE"
+      fi
+    fi
+  done
+
+  echo ${RETVAL[*]}
+}
+
 func1() {
   local INPUT=$1
   local OUTPUT=$2
@@ -79,7 +108,7 @@ OUTDIR=${INDIR}/../perf.csv
 [ ! -d ${OUTDIR} ] && mkdir ${OUTDIR}
 OUTPUT=${OUTDIR}/`basename ${INPUT}`
 
-EVENTS_A=(`echo $EVENTS | sed "s:/,:/ :g"`)
+EVENTS_A=`split_events`
 
 $PERF script -i ${INPUT}_0 > $TMPDIR/$$
 
