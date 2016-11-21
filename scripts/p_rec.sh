@@ -54,26 +54,15 @@ PERF=`which perf`
 while getopts d:hp: OPT
 do
   case $OPT in
-    d)
-      OUTDIR=$OPTARG
-      ;;
-    e)
-      EVENT=$OPTARG
-      ;;
-    h)
-      usage_exit
-      ;;
-    p)
-      PERF=$OPTARG
-      ;;
-    \?)
-      usage_exit
-      ;;
+    d) OUTDIR=$OPTARG ;;
+    e) EVENT=$OPTARG ;;
+    h) usage_exit ;;
+    p) PERF=$OPTARG ;;
+    \?) usage_exit ;;
   esac
 done
 
 shift $((OPTIND - 1))
-
 
 [ ! -x "$PERF" ] && echo "perf command not found!" >&2 && exit
 [ `check_perf_ver 3.16.7`  == 0 ] \
