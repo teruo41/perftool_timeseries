@@ -49,7 +49,7 @@ SCRDIR=$(readlink -f `dirname $0`)
 OUTDIR=${SCRDIR}/../perf.data.dir
 EVENTS="cpu/cpu-cycles,period=10000000/"
 EVENTS=$EVENTS",cpu/instructions,period=10000000/"
-EVENTS=$EVENTS",cpu/cache-misses,period=1000/"
+EVENTS=$EVENTS",cpu/cache-misses,period=10000/"
 PERF=`which perf`
 while getopts d:hp: OPT
 do
