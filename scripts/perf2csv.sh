@@ -21,6 +21,10 @@ split_events() {
     if [ $SLASHFLAG == "TRUE" ]; then
       TMP=$TMP,$STR
       if [[ "$STR" =~ / ]]; then
+        # when the event has 'name=', extract its name.
+        if [[ "$TMP" =~ name= ]]; then
+          TMP=`echo $TMP | sed "s:.*name=\([^,/]*\)[,/].*:\1:"`
+        fi
         RETVAL[${#RETVAL[*]}]=$TMP
         TMP=""
         SLASHFLAG="FALSE"
