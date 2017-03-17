@@ -8,9 +8,9 @@
 SCRDIR=$(readlink -f `dirname $0`)
 TMPDIR="${SCRDIR}/../tmp"
 
-RECORD=${SCRDIR}/p_rec.sh
+RECORD=${SCRDIR}/perf_ts_record.sh
 PERF2CSV=${SCRDIR}/perf2csv.sh
-ANALYZE=${SCRDIR}/perf_analyze.py
+ANALYZE=${SCRDIR}/perf_ts_analyze.py
 
 [ -d ${TMPDIR} ] && rm ${TMPDIR}/*
 

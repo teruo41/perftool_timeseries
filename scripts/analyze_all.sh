@@ -8,7 +8,7 @@
 #
 
 SCRDIR=$(readlink -f `dirname $0`)
-ANALYZE=${SCRDIR}/perf_analyze.py
+ANALYZE=${SCRDIR}/perf_ts_analyze.py
 
 ## Arguments ##
 INPUT=$1  # like ./perf.csv/20141113102546

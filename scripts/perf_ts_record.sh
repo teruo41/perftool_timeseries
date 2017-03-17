@@ -6,10 +6,10 @@
 
 usage_exit() {
 cat <<EOT
-Usage: $0 [-e event[,event2,...]] [-d DIR] [-p /path/to/perf] -- command
+Usage: $0 [-e event[,event2,...]] [-d DIR] [-p /path/to/perf] [-u] -- command
        $0 [-h]
-Note:  Root privilege is needed for sample C-state info.
-       Events can be set with period or freq like:
+       Note:  Root privilege is needed to sample C-state info. (default)
+       Events can be configured with sampling period or freq like:
          -e cpu/cpu-cycles,period=1000000/
          -e cpu/cpu-cycles,freq=100000/
        Default command is "openssl speed rsa512 (-multi #cpus)."
@@ -18,7 +18,10 @@ exit
 }
 
 get_perf_ver() {
-  $PERF --version | awk '{print $3}' | cut -f1 -d- | sed "s:\.: :g"
+  $PERF --version | \
+    awk '{print $3}' | \
+    cut -f1 -d- | \
+    sed "s:\.: :g"
 }
 
 check_perf_ver() {
@@ -50,14 +53,16 @@ OUTDIR=${SCRDIR}/../perf.data.dir
 EVENTS="cpu/cpu-cycles,period=10000000/"
 EVENTS=$EVENTS",cpu/instructions,period=10000000/"
 EVENTS=$EVENTS",cpu/cache-misses,period=10000/"
+PRIV=TRUE
 PERF=`which perf`
-while getopts d:hp: OPT
+while getopts d:hp:u OPT
 do
   case $OPT in
     d) OUTDIR=$OPTARG ;;
     e) EVENT=$OPTARG ;;
     h) usage_exit ;;
     p) PERF=$OPTARG ;;
+    u) PRIV=FALSE ;;
     \?) usage_exit ;;
   esac
 done
@@ -65,8 +70,9 @@ done
 shift $((OPTIND - 1))
 
 [ ! -x "$PERF" ] && echo "perf command not found!" >&2 && exit
-[ `check_perf_ver 3.16.7`  == 0 ] \
-  && echo "perf is older than 3.16.7. Please update it." && exit
+[ `check_perf_ver 3.16.7`  == 0 ] && \
+  echo -n "perf is older than 3.16.7. " && \
+  echo "Please update it to use this script." && exit
 
 [ ! -d ${OUTDIR} ] && mkdir ${OUTDIR}
 OUTPUT=${OUTDIR}/`date +%Y%m%d%H%M%S`
@@ -75,7 +81,7 @@ TMPDIR=${SCRDIR}/../tmp
 [ ! -d $TMPDIR ] && mkdir ${TMPDIR}
 echo ${OUTPUT} > ${TMPDIR}/p_rec.tmp
 
-ARGS="-a -e $EVENTS -o ${OUTPUT}_0"
+ARGS="-e $EVENTS -o ${OUTPUT}_0"
 
 if [ -z "$@" ]
 then
@@ -90,10 +96,15 @@ else
   CMD="$@"
 fi
 
-sudo ${PERF} timechart record \
+if [ $PRIV = "TRUE" ]
+then
+  sudo ${PERF} timechart record \
+    ${PERF} record -a $ARGS -- $CMD
+  
+  sudo mv perf.data ${OUTPUT}_p
+  
+  sudo chown ${USER}. ${OUTPUT}_0
+  sudo chown ${USER}. ${OUTPUT}_p
+else
   ${PERF} record $ARGS -- $CMD
-
-sudo mv perf.data ${OUTPUT}_p
-
-sudo chown ${USER}. ${OUTPUT}_0
-sudo chown ${USER}. ${OUTPUT}_p
+fi

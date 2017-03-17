@@ -3,7 +3,7 @@
 # by teruo
 
 ## Readme ##
-# usage: ./perf_analyze.py input cpu event offset length
+# usage: ./perf_ts_analyze.py input cpu event offset length
 # args:  input  := csv file (output of perf2csv.sh, without _p)
 #        cpu    := logical CPU core count, like 32
 #        event  := event name, like 'cpu-cycles'
@@ -274,14 +274,18 @@ if __name__ == '__main__':
     args = []
     for i in range(ncpus):
       args.append((dbs[i], event, cpu, start, end))
+
     result2 = p.map(analyze_events, args)
     summary = reduce_analyze_events(result2)
 
     cpu_events = numpy.array([ 0 for i in range(cpu) ])
+
     for key in summary.keys():
       cpu_events += summary[key]
       summary[key] = numpy.append(summary[key], numpy.sum(summary[key]))
+
     cpu_events_ratio = cpu_events/float(sum(cpu_events))*100
+
   elif event in [ "mpki", "ipc" ]:
     if event == "mpki":
       event1 = "cache-misses"
@@ -295,6 +299,7 @@ if __name__ == '__main__':
       args.append((dbs[i], event1, cpu, start, end))
     for i in range(ncpus):
       args.append((dbs[i], event2, cpu, start, end))
+
     result2 = p.map(analyze_events, args)
 
     summary  = {}
