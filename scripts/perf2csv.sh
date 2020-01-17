@@ -55,7 +55,7 @@ func1() {
   #   local PATTERN=${EVENTS_A[$IDX]}
   # fi
   local PATTERN=${EVENTS_A[$IDX]}
-  grep $PATTERN $INPUT | \
+  cat $INPUT | grep $PATTERN | \
     sed -e "/^#/d"     | \
     sed "s/^ \+//g"    | \
     sed "s/:\? \+/;/g" >> ${OUTPUT}_${IDX}.csv
@@ -102,7 +102,7 @@ OUTDIR=${INDIR}/../perf.csv
 [ ! -d ${OUTDIR} ] && mkdir ${OUTDIR}
 OUTPUT=${OUTDIR}/`basename ${INPUT}`
 
-EVENTS_A=`split_events`
+EVENTS_A=(`split_events`)
 
 $PERF script -i ${INPUT}_0 > $TMPDIR/$$
 
